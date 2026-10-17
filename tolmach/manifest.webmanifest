@@ -1,0 +1,14 @@
+{
+  "name": "Tolmach",
+  "short_name": "Tolmach",
+  "description": "Hear Russian conversations in English, live, in your AirPods.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f0e24",
+  "theme_color": "#14123a",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

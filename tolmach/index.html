@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Hear Russian conversations in English, live, in your AirPods.">
+  <meta name="theme-color" content="#14123a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Tolmach">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <title>Tolmach</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="icons/icon-192.png" alt="" width="28" height="28">
+      <span>Tolmach</span>
+    </div>
+    <span id="status" class="pill" data-phase="idle">Ready</span>
+    <button id="open-settings" class="icon-button" aria-label="Settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>
+    </button>
+  </header>
+
+  <section id="engine-picker" class="engines" role="radiogroup" aria-label="Translation engine"></section>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <main id="transcript" class="transcript" aria-live="polite">
+    <div id="empty" class="empty">
+      <div class="empty-icon" aria-hidden="true">👂</div>
+      <h2>Ready when you are</h2>
+      <p>Put your AirPods in, set the phone on the table and tap <b>Start listening</b>. When people speak Russian you'll hear the English in your ear and see it here.</p>
+      <p class="muted">Keep this page open with the screen on: browsers stop the microphone when the phone locks.</p>
+    </div>
+    <ol id="segments" class="segments"></ol>
+    <div id="interim" class="interim" hidden></div>
+  </main>
+
+  <footer class="controls">
+    <button id="start" class="primary">Start listening</button>
+    <div id="running" class="running" hidden>
+      <div id="meter" class="meter" aria-label="Microphone level"><i></i><i></i><i></i><i></i><i></i></div>
+      <button id="mute" class="icon-button" aria-label="Mute voice" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="on" d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/><path class="off" d="M4 9v6h4l5 4V5L8 9H4zm12.6 3 2.7-2.7-1.4-1.4-2.7 2.7-2.7-2.7-1.4 1.4 2.7 2.7-2.7 2.7 1.4 1.4 2.7-2.7 2.7 2.7 1.4-1.4z"/></svg>
+      </button>
+      <button id="skip" class="icon-button" aria-label="Skip to latest speech" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6v12l8.5-6zM14 6v12l8.5-6z" transform="translate(-1.5 0)"/></svg>
+        <span id="backlog"></span>
+      </button>
+      <button id="stop" class="stop">Stop</button>
+    </div>
+    <div id="stats" class="stats" hidden></div>
+  </footer>
+
+  <dialog id="settings">
+    <form method="dialog" class="sheet">
+      <header class="sheet-header">
+        <h2>Settings</h2>
+        <button class="text-button" value="done">Done</button>
+      </header>
+
+      <fieldset>
+        <legend>API keys</legend>
+        <p class="hint">Keys are saved only in this browser on this device. Each service bills you directly.</p>
+        <label>Google Gemini <a target="_blank" rel="noopener" href="https://aistudio.google.com/apikey">get a key</a>
+          <input id="key-gemini" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…">
+        </label>
+        <label>Soniox <a target="_blank" rel="noopener" href="https://console.soniox.com">get a key</a>
+          <input id="key-soniox" type="password" autocomplete="off" spellcheck="false" placeholder="Soniox API key">
+        </label>
+        <label>OpenAI <a target="_blank" rel="noopener" href="https://platform.openai.com/api-keys">get a key</a>
+          <input id="key-openai" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Listening</legend>
+        <label>Microphone
+          <select id="mic"><option value="">Default</option></select>
+        </label>
+        <label>English voice <span class="hint-inline">(Soniox reads translations with your device's voice)</span>
+          <select id="voice"><option value="">Best available</option></select>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>In your ear</legend>
+        <label class="toggle"><input id="catch-up" type="checkbox"> Speed up to catch up</label>
+        <label class="toggle"><input id="skip-english" type="checkbox"> Don't repeat English</label>
+        <label class="toggle"><input id="show-source" type="checkbox"> Show the Russian original</label>
+        <label>Stop after silence
+          <select id="auto-stop">
+            <option value="5">5 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="0">Never</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <p class="hint">While listening, microphone audio goes to the service you picked. Nothing is recorded or saved here; the transcript disappears when you clear it or reload.</p>
+    </form>
+  </dialog>
+</body>
+</html>
